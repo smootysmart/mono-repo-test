@@ -1,4 +1,7 @@
 .env
+.env.prod
+.env.dev
+.env.uat
 .secrets
 
 .idea/
