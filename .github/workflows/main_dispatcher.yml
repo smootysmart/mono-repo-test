@@ -1,0 +1,41 @@
+name: Monorepo CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  filter_and_dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      # 1. ตรวจสอบว่า Path ไหนมีการเปลี่ยนแปลง
+      - name: Check for changed paths
+        id: filter
+        uses: dorny/paths-filter@v2
+        with:
+          # ตัวกรองที่กำหนด: ตรวจสอบการเปลี่ยนแปลงใน folder 'frontend' และ 'backend'
+          filters: |
+            frontend:
+              - 'Vue-APP/**'
+            backend:
+              - 'GO-APP/**'
+
+      # 2. เรียกใช้ Backend Workflow (ถ้ามีการเปลี่ยนแปลง)
+      - name: Backend CI Workflow
+        if: steps.filter.outputs.backend == 'true'
+        uses: ./.github/workflows/go-app_ci.yml@main
+        with:
+          env: 'dev'
+          tag: ${{ github.sha }}
+
+      # 3. เรียกใช้ Frontend Workflow (ถ้ามีการเปลี่ยนแปลง)
+      - name: Frontend CI Workflow
+        if: steps.filter.outputs.frontend == 'true'
+        uses: ./.github/workflows/vue-app_ci.yml@main
+        with:
+          env: 'dev'
+          tag: ${{ github.sha }}
