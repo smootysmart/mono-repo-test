@@ -31,6 +31,8 @@ jobs:
         with:
           env: 'dev'
           tag: ${{ github.sha }}
+          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # 3. เรียกใช้ Frontend Workflow (ถ้ามีการเปลี่ยนแปลง)
       - name: Frontend CI Workflow
