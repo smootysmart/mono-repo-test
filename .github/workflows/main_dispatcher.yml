@@ -81,7 +81,10 @@ jobs:
       - name: create env for git sha
         run: echo "TAG=${{ github.sha }}" > .env
       - name: Deploy Backend
-        run: docker compose up -f docker-compose.yml backend -d
+        run: docker compose up backend -d
+
+      - name: remove .env
+        run: rm .env
       
       - name: remove unused images
         run: docker image prune -a
@@ -104,7 +107,10 @@ jobs:
       - name: create env for git sha
         run: echo "TAG=${{ github.sha }}" > .env
       - name: Deploy Frontend
-        run: docker compose up -d --build frontend
+        run: docker compose up -d frontend
+
+      - name: remove .env
+        run: rm .env
 
       - name: remove unused images
         run: docker image prune -a
