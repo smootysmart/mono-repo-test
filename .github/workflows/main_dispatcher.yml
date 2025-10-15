@@ -56,7 +56,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Deploy MongoDB
-        run: docker compose up -d -f docker-compose.yml mongodb
+        run: docker compose up -f docker-compose.yml mongodb -d
   
   backend_cd:
     needs: backend_ci
@@ -66,7 +66,7 @@ jobs:
       - name: pull image from docker hub
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ github.sha }}
       - name: Deploy Backend
-        run: docker compose up -d -f docker-compose.yml backend
+        run: docker compose up -f docker-compose.yml backend -d
   
   frontend_cd:
     needs: frontend_ci
@@ -76,4 +76,4 @@ jobs:
       - name: pull image from docker hub
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ github.sha }}
       - name: Deploy Frontend
-        run: docker compose up -d -f docker-compose.yml frontend
+        run: docker compose up -f docker-compose.yml frontend -d
