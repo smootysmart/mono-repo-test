@@ -78,9 +78,14 @@ jobs:
         run: |
               ls -la
               docker images
+      - name: create env for git sha
+        run: echo "TAG=${{ github.sha }}" > .env
       - name: Deploy Backend
         run: docker compose up -f docker-compose.yml backend -d
-  
+      
+      - name: remove unused images
+        run: docker image prune -a
+
   frontend_cd:
     needs: frontend_ci
     if: ${{ needs.filter_paths.outputs.frontend_changed == 'true' }} # ตรวจสอบ Output
@@ -88,6 +93,7 @@ jobs:
     steps:
       - name: Checkout code 
         uses: actions/checkout@v4
+      
       - name: pull image from docker hub
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ github.sha }}
 
@@ -95,5 +101,10 @@ jobs:
         run: |
               ls -la
               docker images
+      - name: create env for git sha
+        run: echo "TAG=${{ github.sha }}" > .env
       - name: Deploy Frontend
         run: docker compose up -d --build frontend
+
+      - name: remove unused images
+        run: docker image prune -a
