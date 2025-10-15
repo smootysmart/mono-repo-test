@@ -25,6 +25,9 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '1.25'
+      
+      - name: Get in Folder
+        run: cd ./GO-APP
 
       - name: Install dependencies
         run: go mod tidy

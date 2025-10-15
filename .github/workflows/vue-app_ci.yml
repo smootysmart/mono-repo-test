@@ -24,6 +24,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      
+      - name: Get in Folder
+        run: cd ./Vue-APP
 
       # 1. Install & Build Artifacts (CI)
       - name: Install dependencies & Build
@@ -46,4 +49,4 @@ jobs:
         with:
             context: .
             push: true
-            tags: ${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.tag }}
+            tags: ${{ secrets.DOCKERHUB_USERNAME }}:${{ inputs.tag }}
