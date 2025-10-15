@@ -30,11 +30,8 @@ jobs:
   backend_ci:
     needs: filter_paths # ระบุการขึ้นต่อกัน
     if: ${{ needs.filter_paths.outputs.backend_changed == 'true' }} # ตรวจสอบ Output
-    
-    # *** จุดที่แก้ไข *** ใช้ 'uses:' ที่ระดับ JOB
     uses: smootysmart/mono-repo-test/.github/workflows/go-app_ci.yml@main
     with:
-      env: 'dev'
       tag: ${{ github.sha }}
       
     # Secrets ต้องส่งผ่าน 'secrets:' block (หาก Workflow ย่อยต้องการ)
@@ -46,11 +43,8 @@ jobs:
   frontend_ci:
     needs: filter_paths
     if: ${{ needs.filter_paths.outputs.frontend_changed == 'true' }} # ตรวจสอบ Output
-    
-    # *** จุดที่แก้ไข *** ใช้ 'uses:' ที่ระดับ JOB
     uses: smootysmart/mono-repo-test/.github/workflows/vue-app_ci.yml@main
     with:
-      env: 'dev'
       tag: ${{ github.sha }}
       
     secrets: 
