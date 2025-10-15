@@ -1,8 +1,8 @@
 name: Monorepo CI Dispatcher
 
 on:
-  push:
-    branches: [ main, deploydb ]
+  # push:
+  #   branches: [ main, deploydb ]
   pull_request:
     branches: [ main, deploydb ]
 
@@ -76,4 +76,4 @@ jobs:
       - name: pull image from docker hub
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ github.sha }}
       - name: Deploy Frontend
-        run: docker compose up -f docker-compose.yml frontend -d
+        run: docker compose up -d --build frontend
