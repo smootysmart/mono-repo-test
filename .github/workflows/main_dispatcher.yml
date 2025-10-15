@@ -52,8 +52,8 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   database_cd:
+    runs-on: self-hostedg
     if: ${{ github.event.labels.name == 'Deploy_DB' }}
-    runs-on: self-hosted
     steps:
       - name: Deploy MongoDB
         run: docker compose up -f docker-compose.yml mongodb -d
