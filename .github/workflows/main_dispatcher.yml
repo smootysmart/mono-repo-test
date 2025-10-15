@@ -58,14 +58,19 @@ jobs:
     runs-on: self-hosted
     if: ${{ github.event.labels.name == 'Deploy_DB' || needs.filter_paths.outputs.database_changed == 'true' }}
     steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4
+      
       - name: Deploy MongoDB
         run: docker compose up -f docker-compose.yml mongodb -d
-  
+        
   backend_cd:
     needs: backend_ci
     if: ${{ needs.filter_paths.outputs.backend_changed == 'true' }}
     runs-on: self-hosted
     steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4
       - name: pull image from docker hub
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ github.sha }}
       
@@ -79,6 +84,8 @@ jobs:
     if: ${{ needs.filter_paths.outputs.frontend_changed == 'true' }} # ตรวจสอบ Output
     runs-on: self-hosted
     steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4
       - name: pull image from docker hub
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ github.sha }}
       - name: Deploy Frontend
