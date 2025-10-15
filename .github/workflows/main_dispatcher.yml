@@ -54,6 +54,7 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   database_cd:
+    needs: filter_paths
     runs-on: self-hosted
     if: ${{ github.event.labels.name == 'Deploy_DB' || needs.filter_paths.outputs.database_changed == 'true' }}
     steps:
