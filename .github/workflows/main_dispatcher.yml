@@ -26,7 +26,7 @@ jobs:
             backend:
               - 'GO-APP/**'
             database:
-              - 'Database.txt'
+              - 'Database/**'
 
   # 2. Job สำหรับเรียก Backend CI (Reusable Workflow Call)
   backend_ci:
@@ -56,7 +56,7 @@ jobs:
   database_cd:
     needs: filter_paths
     runs-on: self-hosted
-    if: ${{ github.event.labels.name == 'Deploy_DB' || needs.filter_paths.outputs.database_changed == 'true' }}
+    if: ${{ needs.filter_paths.outputs.database_changed == 'true' }}
     steps:
       - name: Checkout code 
         uses: actions/checkout@v4
