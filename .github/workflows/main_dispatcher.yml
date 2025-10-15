@@ -74,8 +74,10 @@ jobs:
       - name: pull image from docker hub
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ github.sha }}
       
-      - name: where am i
-        run: ls -la
+      - name: where am i and images
+        run: |
+              ls -la
+              docker images
       - name: Deploy Backend
         run: docker compose up -f docker-compose.yml backend -d
   
@@ -88,5 +90,10 @@ jobs:
         uses: actions/checkout@v4
       - name: pull image from docker hub
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ github.sha }}
+
+      - name: where am i and images
+        run: |
+              ls -la
+              docker images
       - name: Deploy Frontend
         run: docker compose up -d --build frontend
