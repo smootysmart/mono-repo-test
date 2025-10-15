@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: docker build
-        run: docker build ./GO-APP -t ${{ secrets.DOCKERHUB_USERNAME }}:${{ inputs.tag }}
+        run: docker build ./GO-APP -t ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ inputs.tag }}
 
       - name: push image to docker hub
         run: |

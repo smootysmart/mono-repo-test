@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: docker build
-        run: docker build ./Vue-APP -t ${{ secrets.DOCKERHUB_USERNAME }}:${{ inputs.tag }}
+        run: docker build ./Vue-APP -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ inputs.tag }}
 
       - name: push image to docker hub
         run: |
