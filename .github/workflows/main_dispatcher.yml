@@ -52,7 +52,7 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   database_cd:
-    if: github.event.labels.name == 'Deploy_DB'
+    if: ${{ github.event.labels.name == 'Deploy_DB' }}
     runs-on: self-hosted
     steps:
       - name: Deploy MongoDB
