@@ -25,6 +25,8 @@ jobs:
               - 'Vue-APP/**'
             backend:
               - 'GO-APP/**'
+            database:
+              - 'Database.txt'
 
   # 2. Job สำหรับเรียก Backend CI (Reusable Workflow Call)
   backend_ci:
@@ -52,8 +54,8 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   database_cd:
-    runs-on: self-hostedg
-    if: ${{ github.event.labels.name == 'Deploy_DB' }}
+    runs-on: self-hosted
+    if: ${{ github.event.labels.name == 'Deploy_DB' || needs.filter_paths.outputs.database_changed == 'true' }}
     steps:
       - name: Deploy MongoDB
         run: docker compose up -f docker-compose.yml mongodb -d
