@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    # env_file:
+    #   - /home/smart/.env
+    ports:
+      - "27017:27017"
+    networks:
+      - database-network
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    restart: always
+    image: ${DOCKERHUB_USERNAME}/backend:${TAG}
+    container_name: backend
+    ports:
+      - "8080:8080"
+    # env_file: 
+    #   - /home/smart/.env
+    networks:
+      - app-network
+      - database-network
+
+  frontend:
+    restart: always
+    image: ${DOCKERHUB_USERNAME}/frontend:${TAG}
+    container_name: frontend
+    ports:
+      - "80:80"
+    # env_file: 
+    #   - /home/smart/.env
+    networks:
+      - app-network
+
+volumes:
+  mongo_data:
+
+networks:
+  app-network:
+    driver: bridge
+  database-network:
+    driver: bridge

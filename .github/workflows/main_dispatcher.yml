@@ -2,9 +2,9 @@ name: Monorepo CI Dispatcher
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, deploydb ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, deploydb ]
 
 jobs:
   # 1. Job สำหรับตรวจสอบการเปลี่ยนแปลง (Filter Job)
@@ -50,3 +50,30 @@ jobs:
     secrets: 
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  database_cd:
+    if: github.event.labels.name == 'Deploy_DB'
+    runs-on: self-hosted
+    steps:
+      - name: Deploy MongoDB
+        run: docker compose up -d -f docker-compose.yml mongodb
+  
+  backend_cd:
+    needs: backend_ci
+    if: ${{ needs.filter_paths.outputs.backend_changed == 'true' }}
+    runs-on: self-hosted
+    steps:
+      - name: pull image from docker hub
+        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ github.sha }}
+      - name: Deploy Backend
+        run: docker compose up -d -f docker-compose.yml backend
+  
+  frontend_cd:
+    needs: frontend_ci
+    if: ${{ needs.filter_paths.outputs.frontend_changed == 'true' }} # ตรวจสอบ Output
+    runs-on: self-hosted
+    steps:
+      - name: pull image from docker hub
+        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ github.sha }}
+      - name: Deploy Frontend
+        run: docker compose up -d -f docker-compose.yml frontend
