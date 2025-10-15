@@ -1,4 +1,4 @@
-name: Monorepo CI
+name: Monorepo CI Dispatcher
 
 on:
   push:
@@ -7,39 +7,52 @@ on:
     branches: [ main ]
 
 jobs:
-  filter_and_dispatch:
+  # 1. Job สำหรับตรวจสอบการเปลี่ยนแปลง (Filter Job)
+  filter_paths:
     runs-on: ubuntu-latest
+    outputs:
+      frontend_changed: ${{ steps.filter.outputs.frontend }}
+      backend_changed: ${{ steps.filter.outputs.backend }}
     steps:
       - uses: actions/checkout@v4
       
-      # 1. ตรวจสอบว่า Path ไหนมีการเปลี่ยนแปลง
       - name: Check for changed paths
         id: filter
         uses: dorny/paths-filter@v2
         with:
-          # ตัวกรองที่กำหนด: ตรวจสอบการเปลี่ยนแปลงใน folder 'frontend' และ 'backend'
           filters: |
             frontend:
               - 'Vue-APP/**'
             backend:
               - 'GO-APP/**'
 
-      # 2. เรียกใช้ Backend Workflow (ถ้ามีการเปลี่ยนแปลง)
-      - name: Backend CI Workflow
-        uses: smootysmart/mono-repo-test/.github/workflows/go-app_ci.yml@main
-        if: steps.filter.outputs.backend == 'true'
-        with:
-          env: 'dev'
-          tag: ${{ github.sha }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  # 2. Job สำหรับเรียก Backend CI (Reusable Workflow Call)
+  backend_ci:
+    needs: filter_paths # ระบุการขึ้นต่อกัน
+    if: ${{ needs.filter_paths.outputs.backend_changed == 'true' }} # ตรวจสอบ Output
+    
+    # *** จุดที่แก้ไข *** ใช้ 'uses:' ที่ระดับ JOB
+    uses: smootysmart/mono-repo-test/.github/workflows/go-app_ci.yml@main
+    with:
+      env: 'dev'
+      tag: ${{ github.sha }}
+      
+    # Secrets ต้องส่งผ่าน 'secrets:' block (หาก Workflow ย่อยต้องการ)
+    secrets: 
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3. เรียกใช้ Frontend Workflow (ถ้ามีการเปลี่ยนแปลง)
-      - name: Frontend CI Workflow
-        uses: smootysmart/mono-repo-test/.github/workflows/vue-app_ci.yml@main
-        if: steps.filter.outputs.frontend == 'true'
-        with:
-          env: 'dev'
-          tag: ${{ github.sha }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  # 3. Job สำหรับเรียก Frontend CI (Reusable Workflow Call)
+  frontend_ci:
+    needs: filter_paths
+    if: ${{ needs.filter_paths.outputs.frontend_changed == 'true' }} # ตรวจสอบ Output
+    
+    # *** จุดที่แก้ไข *** ใช้ 'uses:' ที่ระดับ JOB
+    uses: smootysmart/mono-repo-test/.github/workflows/vue-app_ci.yml@main
+    with:
+      env: 'dev'
+      tag: ${{ github.sha }}
+      
+    secrets: 
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
