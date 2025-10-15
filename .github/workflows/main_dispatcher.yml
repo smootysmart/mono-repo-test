@@ -27,17 +27,19 @@ jobs:
       # 2. เรียกใช้ Backend Workflow (ถ้ามีการเปลี่ยนแปลง)
       - name: Backend CI Workflow
         if: steps.filter.outputs.backend == 'true'
-        uses: ./.github/workflows/go-app_ci.yml@main
+        uses: smootysmart/mono-repo-test/.github/workflows/go-app_ci.yml@main
         with:
           env: 'dev'
           tag: ${{ github.sha }}
-          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # 3. เรียกใช้ Frontend Workflow (ถ้ามีการเปลี่ยนแปลง)
       - name: Frontend CI Workflow
         if: steps.filter.outputs.frontend == 'true'
-        uses: ./.github/workflows/vue-app_ci.yml@main
+        uses: smootysmart/mono-repo-test/.github/workflows/vue-app_ci.yml@main
         with:
           env: 'dev'
           tag: ${{ github.sha }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
