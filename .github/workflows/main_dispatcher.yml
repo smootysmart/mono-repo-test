@@ -67,6 +67,9 @@ jobs:
     steps:
       - name: pull image from docker hub
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ github.sha }}
+      
+      - name: where am i
+        run: ls -la
       - name: Deploy Backend
         run: docker compose up -f docker-compose.yml backend -d
   
