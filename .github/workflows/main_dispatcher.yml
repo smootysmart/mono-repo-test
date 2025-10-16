@@ -25,8 +25,6 @@ jobs:
               - 'Vue-APP/**'
             backend:
               - 'GO-APP/**'
-            database:
-              - 'Database/**'
 
   # 2. Job สำหรับเรียก Backend CI (Reusable Workflow Call)
   backend_ci:
@@ -44,7 +42,7 @@ jobs:
   # 3. Job สำหรับเรียก Frontend CI (Reusable Workflow Call)
   frontend_ci:
     needs: filter_paths
-    if: ${{ needs.filter_paths.outputs.frontend_changed == 'true' }} # ตรวจสอบ Output
+    if: ${{ needs.filter_paths.outputs.frontend_changed == 'true' }} 
     uses: smootysmart/mono-repo-test/.github/workflows/vue-app_ci.yml@main
     with:
       tag: ${{ github.sha }}
@@ -54,9 +52,8 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   database_cd:
-    needs: filter_paths
+    if: ${{ github.env.DEPLOY_DB == 'true' }}
     runs-on: self-hosted
-    if: ${{ needs.filter_paths.outputs.database_changed == 'true' }}
     steps:
       - name: Checkout code 
         uses: actions/checkout@v4
@@ -78,13 +75,14 @@ jobs:
         run: |
               ls -la
               docker images
+
       - name: create env for git sha
         run: echo "TAG=${{ github.sha }}" > .env
       - name: Deploy Backend
         run: docker compose up backend -d
 
-      - name: remove .env
-        run: rm .env
+      # - name: remove .env
+      #   run: rm .env
       
       - name: remove unused images
         run: docker image prune -a -f
@@ -109,8 +107,8 @@ jobs:
       - name: Deploy Frontend
         run: docker compose up -d frontend
 
-      - name: remove .env
-        run: rm .env
+      # - name: remove .env
+      #   run: rm .env
 
       - name: remove unused images
         run: docker image prune -a -f
