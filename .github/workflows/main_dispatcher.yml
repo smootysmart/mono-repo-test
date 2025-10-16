@@ -28,7 +28,7 @@ jobs:
 
   database_cd:
     needs: filter_paths
-    if: ${{ github.env.DEPLOY_DB == 'true' }}
+    # if: ${{ github.env.DEPLOY_DB == 'true' }}
     runs-on: self-hosted
     steps:
       - name: Checkout code 
