@@ -26,6 +26,18 @@ jobs:
             backend:
               - 'GO-APP/**'
 
+  database_cd:
+    needs: filter_paths
+    if: ${{ github.env.DEPLOY_DB == 'true' }}
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4
+      
+      - name: Deploy MongoDB
+        run: docker compose up -f docker-compose.yml mongodb -d
+        
+
   # 2. Job สำหรับเรียก Backend CI (Reusable Workflow Call)
   backend_ci:
     needs: filter_paths # ระบุการขึ้นต่อกัน
@@ -50,6 +62,7 @@ jobs:
     secrets: 
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
 
   backend_cd:
     needs: backend_ci
