@@ -51,7 +51,7 @@ jobs:
 
   database_cd:
     needs: filter_paths
-    # if: ${{ vars.DEPLOYDB == 'true' }}
+    if: ${{ vars.DEPLOYDB == 'true' }}
     runs-on: self-hosted
     steps:
       - name: Checkout code 
