@@ -79,7 +79,9 @@ jobs:
         run: docker compose -f docker-compose.yml up backend -d
 
       - name: remove variable in .env
-        run: sed -i '/^TAG=/d' .env 
+        run: | 
+          cat .env
+          sed -i '/^TAG=/d' .env 
       
       - name: remove unused images
         run: docker image prune -a -f
