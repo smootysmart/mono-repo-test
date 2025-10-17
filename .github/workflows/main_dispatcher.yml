@@ -26,18 +26,6 @@ jobs:
             backend:
               - 'GO-APP/**'
 
-  database_cd:
-    needs: filter_paths
-    # if: ${{ github.env.DEPLOY_DB == 'true' }}
-    runs-on: self-hosted
-    steps:
-      - name: Checkout code 
-        uses: actions/checkout@v4
-      
-      - name: Deploy MongoDB
-        run: docker compose up -f docker-compose.yml mongodb -d
-        
-
   # 2. Job สำหรับเรียก Backend CI (Reusable Workflow Call)
   backend_ci:
     needs: filter_paths # ระบุการขึ้นต่อกัน
@@ -63,6 +51,16 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
+  database_cd:
+    needs: filter_paths
+    # if: ${{ vars.DEPLOYDB == 'true' }}
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4
+      
+      - name: Deploy MongoDB
+        run: docker compose -f docker-compose.yml up mongodb -d
 
   backend_cd:
     needs: backend_ci
@@ -82,10 +80,10 @@ jobs:
       - name: create env for git sha
         run: echo "TAG=${{ github.sha }}" > .env
       - name: Deploy Backend
-        run: docker compose up backend -d
+        run: docker compose -f docker-compose.yml up backend -d
 
       # - name: remove .env
-      #   run: rm .env
+      #   run: rm .env    
       
       - name: remove unused images
         run: docker image prune -a -f
@@ -108,7 +106,7 @@ jobs:
       - name: create env for git sha
         run: echo "TAG=${{ github.sha }}" > .env
       - name: Deploy Frontend
-        run: docker compose up -d frontend
+        run: docker compose -f docker-compose.ymlup -d frontend
 
       # - name: remove .env
       #   run: rm .env
