@@ -1,8 +1,8 @@
 name: Monorepo CI Dispatcher
 
 on:
-  # push:
-  #   branches: [ main, deploydb ]
+  push:
+    branches: [ main, deploydb ]
   pull_request:
     branches: [ main, deploydb ]
 
