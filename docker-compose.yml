@@ -55,6 +55,8 @@ services:
     #   timeout: 3s
     #   retries: 3
     #   start_period: 40s
+    env_file:
+      - /home/smart/.env
     networks:
       - app-network
       - database-network
@@ -71,6 +73,8 @@ services:
     #   timeout: 3s
     #   retries: 3
     #   start_period: 40s
+    env_file:
+      - /home/smart/.env
     networks:
       - app-network
 

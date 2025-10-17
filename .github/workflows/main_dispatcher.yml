@@ -74,16 +74,12 @@ jobs:
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ github.sha }}
 
       - name: create env for git sha
-        run: | 
-          cat .env 
-          echo "TAG=${{ github.sha }}" >> .env
+        run: echo "TAG=${{ github.sha }}" >> /home/smart.env
       - name: Deploy Backend
         run: docker compose -f docker-compose.yml up backend -d
 
       - name: remove variable in .env
-        run: | 
-          cat .env
-          sed -i '/^TAG=/d' .env 
+        run: sed -i '/^TAG=/d' /home/smart/.env 
       
       - name: remove unused images
         run: docker image prune -a -f
@@ -100,12 +96,12 @@ jobs:
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ github.sha }}
 
       - name: create env for git sha
-        run: echo "TAG=${{ github.sha }}" >> .env
+        run: echo "TAG=${{ github.sha }}" >> /home/smart/.env
       - name: Deploy Frontend
         run: docker compose -f docker-compose.yml up -d frontend
 
       - name: remove variable in .env
-        run: sed -i '/^TAG=/d' .env
+        run: sed -i '/^TAG=/d' /home/smart/.env
 
       - name: remove unused images
         run: docker image prune -a -f
