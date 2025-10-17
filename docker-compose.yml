@@ -12,10 +12,38 @@ services:
     #   - /home/smart/.env
     ports:
       - "27017:27017"
+    # healthcheck:
+    #   test: curl -f http://localhost:27017/health || exit 1
+    #   interval: 30s
+    #   timeout: 3s
+    #   retries: 3
+    #   start_period: 40s
     networks:
       - database-network
     volumes:
       - mongo_data:/data/db
+  
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    # healthcheck:
+    #   test: curl -f http://localhost:9001/health || exit 1
+    #   interval: 30s
+    #   timeout: 3s
+    #   retries: 3
+    #   start_period: 40s
+    networks:
+      - database-network
+    volumes:
+      - minio_data:/data
 
   backend:
     restart: always
@@ -23,6 +51,12 @@ services:
     container_name: backend
     ports:
       - "8080:8080"
+    # healthcheck:
+    #   test: curl -f http://localhost:8080/health || exit 1
+    #   interval: 30s
+    #   timeout: 3s
+    #   retries: 3
+    #   start_period: 40s
     # env_file: 
     #   - /home/smart/.env
     networks:
@@ -35,6 +69,12 @@ services:
     container_name: frontend
     ports:
       - "3000:3000"
+    # healthcheck:
+    #   test: curl -f http://localhost:3000/health || exit 1
+    #   interval: 30s
+    #   timeout: 3s
+    #   retries: 3
+    #   start_period: 40s
     # env_file: 
     #   - /home/smart/.env
     networks:

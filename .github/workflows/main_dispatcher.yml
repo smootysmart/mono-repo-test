@@ -60,6 +60,9 @@ jobs:
       - name: Deploy MongoDB
         run: docker compose -f docker-compose.yml up mongodb -d
 
+      - name: Deploy MinIO
+        run: docker compose -f docker-compose.yml up minio -d
+
   backend_cd:
     needs: backend_ci
     if: ${{ needs.filter_paths.outputs.backend_changed == 'true' }}
