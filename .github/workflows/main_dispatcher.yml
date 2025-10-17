@@ -82,7 +82,7 @@ jobs:
         run: docker compose -f docker-compose.yml up backend -d
 
       - name: remove variable in .env
-        run: sed -i '/^TAG=/d' .env
+        run: sed -i '/^TAG=/d' /home/smart/.env
       
       - name: remove unused images
         run: docker image prune -a -f
@@ -107,7 +107,7 @@ jobs:
         run: docker compose -f docker-compose.yml up -d frontend
 
       - name: remove variable in .env
-        run: sed -i '/^TAG=/d' .env
+        run: sed -i '/^TAG=/d' /home/smart/.env
 
       - name: remove unused images
         run: docker image prune -a -f
