@@ -73,13 +73,16 @@ jobs:
       - name: pull image from docker hub
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ github.sha }}
 
+      - name: create symbolic link for .env
+        run: ln -s /home/smart/.env /home/smart/mono-repo-test/_work/mono-repo-test/mono-repo-test/.env
+
       - name: create env for git sha
-        run: echo "TAG=${{ github.sha }}" >> /home/smart/mono-repo-test/.env
+        run: echo "TAG=${{ github.sha }}" >> .env
       - name: Deploy Backend
         run: docker compose -f docker-compose.yml up backend -d
 
       - name: remove variable in .env
-        run: sed -i '/^TAG=/d' /home/smart/mono-repo-test/.env 
+        run: sed -i '/^TAG=/d' .env
       
       - name: remove unused images
         run: docker image prune -a -f
@@ -95,13 +98,16 @@ jobs:
       - name: pull image from docker hub
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ github.sha }}
 
+      - name: create symbolic link for .env
+        run: ln -s /home/smart/.env /home/smart/mono-repo-test/_work/mono-repo-test/mono-repo-test/.env
+
       - name: create env for git sha
-        run: echo "TAG=${{ github.sha }}" >> /home/smart/mono-repo-test/.env
+        run: echo "TAG=${{ github.sha }}" >> .env
       - name: Deploy Frontend
         run: docker compose -f docker-compose.yml up -d frontend
 
       - name: remove variable in .env
-        run: sed -i '/^TAG=/d' /home/smart/mono-repo-test/.env
+        run: sed -i '/^TAG=/d' .env
 
       - name: remove unused images
         run: docker image prune -a -f
