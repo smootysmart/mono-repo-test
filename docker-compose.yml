@@ -56,7 +56,7 @@ services:
     #   retries: 3
     #   start_period: 40s
     env_file:
-      - /home/smart/.env
+      - /home/smart/mono-repo-test/.env
     networks:
       - app-network
       - database-network
@@ -74,7 +74,7 @@ services:
     #   retries: 3
     #   start_period: 40s
     env_file:
-      - /home/smart/.env
+      - /home/smart/mono-repo-test/.env
     networks:
       - app-network
 
