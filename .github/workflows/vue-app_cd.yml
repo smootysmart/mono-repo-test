@@ -1,0 +1,37 @@
+name: Reusable Vue App CD
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+    secrets:
+        DOCKERHUB_USERNAME:
+            required: true
+        DOCKERHUB_TOKEN:
+            required: true
+
+jobs:
+  vue-cd:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4
+      
+      - name: pull image from docker hub
+        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ github.sha }}
+
+      - name: create symbolic link for .env
+        run: ln -s /home/smart/.env /home/smart/mono-repo-test/_work/mono-repo-test/mono-repo-test/.env
+
+      - name: create env for git sha
+        run: echo "TAG=${{ github.sha }}" >> .env
+      - name: Deploy Frontend
+        run: docker compose -f docker-compose.yml up -d frontend
+
+      - name: remove variable in .env
+        run: sed -i '/^TAG=/d' /home/smart/.env
+
+      - name: remove unused images
+        run: docker image prune -a -f

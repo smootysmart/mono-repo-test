@@ -66,48 +66,21 @@ jobs:
   backend_cd:
     needs: backend_ci
     if: ${{ needs.filter_paths.outputs.backend_changed == 'true' }}
-    runs-on: self-hosted
-    steps:
-      - name: Checkout code 
-        uses: actions/checkout@v4
-      - name: pull image from docker hub
-        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ github.sha }}
-
-      - name: create symbolic link for .env
-        run: ln -s /home/smart/.env /home/smart/mono-repo-test/_work/mono-repo-test/mono-repo-test/.env
-
-      - name: create env for git sha
-        run: echo "TAG=${{ github.sha }}" >> .env
-      - name: Deploy Backend
-        run: docker compose -f docker-compose.yml up backend -d
-
-      - name: remove variable in .env
-        run: sed -i '/^TAG=/d' /home/smart/.env
+    uses: smootysmart/mono-repo-test/.github/workflows/go-app_cd.yml@main
+    with:
+      tag: ${{ github.sha }}
       
-      - name: remove unused images
-        run: docker image prune -a -f
+    secrets: 
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   frontend_cd:
     needs: frontend_ci
     if: ${{ needs.filter_paths.outputs.frontend_changed == 'true' }}
-    runs-on: self-hosted
-    steps:
-      - name: Checkout code 
-        uses: actions/checkout@v4
+    uses: smootysmart/mono-repo-test/.github/workflows/vue-app_cd.yml@main
+    with:
+      tag: ${{ github.sha }}
       
-      - name: pull image from docker hub
-        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ github.sha }}
-
-      - name: create symbolic link for .env
-        run: ln -s /home/smart/.env /home/smart/mono-repo-test/_work/mono-repo-test/mono-repo-test/.env
-
-      - name: create env for git sha
-        run: echo "TAG=${{ github.sha }}" >> .env
-      - name: Deploy Frontend
-        run: docker compose -f docker-compose.yml up -d frontend
-
-      - name: remove variable in .env
-        run: sed -i '/^TAG=/d' /home/smart/.env
-
-      - name: remove unused images
-        run: docker image prune -a -f
+    secrets: 
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

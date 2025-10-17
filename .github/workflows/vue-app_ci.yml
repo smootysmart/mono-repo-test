@@ -1,4 +1,4 @@
-name: Vue-APP CI
+name: Reusable Vue App CI
 
 on:
   workflow_call:

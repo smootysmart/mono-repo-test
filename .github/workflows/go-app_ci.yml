@@ -1,4 +1,4 @@
-name: GO-APP CI
+name: Reusable Go App CI
 
 on:
   workflow_call:
