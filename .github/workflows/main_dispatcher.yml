@@ -74,7 +74,7 @@ jobs:
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ github.sha }}
 
       - name: create env for git sha
-        run: echo "TAG=${{ github.sha }}" > .env
+        run: echo "TAG=${{ github.sha }}" >> .env
       - name: Deploy Backend
         run: docker compose -f docker-compose.yml up backend -d
 
@@ -96,7 +96,7 @@ jobs:
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:${{ github.sha }}
 
       - name: create env for git sha
-        run: echo "TAG=${{ github.sha }}" > .env
+        run: echo "TAG=${{ github.sha }}" >> .env
       - name: Deploy Frontend
         run: docker compose -f docker-compose.yml up -d frontend
 
