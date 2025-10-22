@@ -1,0 +1,47 @@
+name: Monorepo Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the target deployment environment'
+        required: true
+        type: choice
+        default: 'uat'
+        options: # ตัวเลือกที่จะปรากฏใน dropdown menu
+          - 'development'
+          - 'uat'
+          - 'production'
+
+jobs:
+
+  database_cd:
+    if: ${{ vars.DEPLOYDB == 'true' }}
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4
+      
+      - name: Deploy MongoDB
+        run: docker compose -f docker-compose.yml up mongodb -d
+
+      - name: Deploy MinIO
+        run: docker compose -f docker-compose.yml up minio -d
+
+  backend_cd:
+    uses: smootysmart/mono-repo-test/.github/workflows/go-app_cd.yml@main
+    with:
+      tag: latest
+      
+    secrets: 
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  frontend_cd:
+    uses: smootysmart/mono-repo-test/.github/workflows/vue-app_cd.yml@main
+    with:
+      tag: latest
+      
+    secrets: 
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

@@ -1,6 +1,20 @@
 version: '3.8'
 services:
 
+  reverse-proxy:
+    image: nginx:latest
+    container_name: reverse-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      # - ./nginx/certs:/etc/nginx/certs
+    networks:
+      - app-network
+      - database-network
+
   mongodb:
     image: mongo:latest
     container_name: mongodb
@@ -10,12 +24,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     ports:
       - "27017:27017"
-    # healthcheck:
-    #   test: curl -f http://localhost:27017/health || exit 1
-    #   interval: 30s
-    #   timeout: 3s
-    #   retries: 3
-    #   start_period: 40s
     networks:
       - database-network
     volumes:
@@ -32,12 +40,6 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
-    # healthcheck:
-    #   test: curl -f http://localhost:9001/health || exit 1
-    #   interval: 30s
-    #   timeout: 3s
-    #   retries: 3
-    #   start_period: 40s
     networks:
       - database-network
     volumes:
@@ -49,12 +51,6 @@ services:
     container_name: backend
     ports:
       - "${BACKEND_PORT}:8080"
-    # healthcheck:
-    #   test: curl -f http://localhost:8080/health || exit 1
-    #   interval: 30s
-    #   timeout: 3s
-    #   retries: 3
-    #   start_period: 40s
     env_file:
       - /home/smart/mono-repo-test/.env
     networks:
@@ -67,12 +63,6 @@ services:
     container_name: frontend
     ports:
       - "3000:3000"
-    # healthcheck:
-    #   test: curl -f http://localhost:3000/health || exit 1
-    #   interval: 30s
-    #   timeout: 3s
-    #   retries: 3
-    #   start_period: 40s
     env_file:
       - /home/smart/mono-repo-test/.env
     networks:

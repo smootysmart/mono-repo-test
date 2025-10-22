@@ -19,18 +19,21 @@ jobs:
       - name: Checkout code 
         uses: actions/checkout@v4
       - name: pull image from docker hub
-        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ github.sha }}
+        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ inputs.tag }}
 
-      - name: create symbolic link for .env
-        run: ln -s /home/smart/.env /home/smart/mono-repo-test/_work/mono-repo-test/mono-repo-test/.env
+      # - name: create symbolic link for .env
+      #   run: ln -s /home/smart/.env /home/smart/mono-repo-test/_work/mono-repo-test/mono-repo-test/.env
+
+      - name: copy .env file
+        run: cp /home/smart/.env .env
 
       - name: create env for git sha
-        run: echo "TAG=${{ github.sha }}" >> .env
+        run: echo "TAG=${{ inputs.tag }}" >> .env
       - name: Deploy Backend
         run: docker compose -f docker-compose.yml up backend -d
 
       - name: remove variable in .env
-        run: sed -i '/^TAG=/d' /home/smart/.env
+        run: sed -i '/^TAG=/d' .env
       
       - name: remove unused images
         run: docker image prune -a -f
