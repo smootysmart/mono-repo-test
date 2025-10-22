@@ -12,8 +12,8 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
       # - ./nginx/certs:/etc/nginx/certs
     networks:
-      - app-network
-      - database-network
+      - ${ENV}-network
+      - ${ENV}-database-network
 
   mongodb:
     image: mongo:latest
@@ -25,9 +25,9 @@ services:
     ports:
       - "27017:27017"
     networks:
-      - database-network
+      - ${ENV}-database-network
     volumes:
-      - mongo_data:/data/db
+      - ${ENV}-mongo_data:/data/db
   
   minio:
     image: quay.io/minio/minio:latest
@@ -41,9 +41,9 @@ services:
       - "9000:9000"
       - "9001:9001"
     networks:
-      - database-network
+      - ${ENV}-database-network
     volumes:
-      - minio_data:/data
+      - ${ENV}-minio_data:/data
 
   backend:
     restart: always
@@ -52,10 +52,10 @@ services:
     ports:
       - "${BACKEND_PORT}:8080"
     env_file:
-      - /home/smart/mono-repo-test/.env
+      - /home/smart/mono-repo-test/.env.${ENV}
     networks:
-      - app-network
-      - database-network
+      - ${ENV}-network
+      - ${ENV}-database-network
 
   frontend:
     restart: always
@@ -64,16 +64,20 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - /home/smart/mono-repo-test/.env
+      - /home/smart/mono-repo-test/.env.${ENV}
     networks:
-      - app-network
+      - ${ENV}-network
 
 volumes:
-  mongo_data:
-  minio_data:
+  prod-mongodb_data:
+  prod-minio_data:
+  dev-mongo_data:
+  dev-minio_data:
+  uat-mongo_data:
+  uat-minio_data:
 
 networks:
-  app-network:
+  ${ENV}-network:
     driver: bridge
-  database-network:
+  ${ENV}-database-network:
     driver: bridge

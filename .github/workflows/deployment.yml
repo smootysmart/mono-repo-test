@@ -32,6 +32,7 @@ jobs:
     uses: smootysmart/mono-repo-test/.github/workflows/go-app_cd.yml@main
     with:
       tag: latest
+      environment: ${{ github.event.inputs.environment }}
       
     secrets: 
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -41,6 +42,7 @@ jobs:
     uses: smootysmart/mono-repo-test/.github/workflows/vue-app_cd.yml@main
     with:
       tag: latest
+      environment: ${{ github.event.inputs.environment }}
       
     secrets: 
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
