@@ -77,7 +77,15 @@ volumes:
   uat-minio_data:
 
 networks:
-  ${ENV}-network:
+  prod-network:
     driver: bridge
-  ${ENV}-database-network:
+  prod-database-network:
+    driver: bridge
+  dev-network:
+    driver: bridge
+  dev-database-network:
+    driver: bridge
+  uat-network:
+    driver: bridge
+  uat-database-network:
     driver: bridge
