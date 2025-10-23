@@ -20,7 +20,7 @@ on:
 jobs:
 
   database_cd:
-    if: ${{ github.event.inputs.tags == true }}
+    if: ${{ github.event.inputs.tags == 'true' }}
     runs-on: self-hosted
     steps:
       - name: Checkout code 
