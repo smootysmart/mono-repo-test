@@ -16,8 +16,14 @@ on:
         description: 'Deploy Database Services'
         required: false
         type: boolean
+        
 
 jobs:
+  gateway_cd:
+    uses: smootysmart/mono-repo-test/.github/workflows/gateway_cd.yml@main
+    with:
+      tag: latest
+      environment: ${{ github.event.inputs.environment }}
 
   database_cd:
     if: ${{ github.event.inputs.tags == 'true' }}

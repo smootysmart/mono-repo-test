@@ -31,7 +31,7 @@ jobs:
       - name: copy .env file
         run: cp /home/smart/.env.${{ inputs.environment }} .env
 
-      - name: create env for git sha
+      - name: add tag to .env
         run: echo "TAG=${{ inputs.tag }}" >> .env
 
       - name: Deploy Frontend

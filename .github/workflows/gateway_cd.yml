@@ -1,0 +1,24 @@
+name: Gateway CD
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+      environment:
+        required: false
+        type: string
+
+jobs:
+  gateway-cd:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4
+
+      - name: copy .env file
+        run: cp /home/smart/.env.${{ inputs.environment }} .env
+
+      - name: Deploy Gateway
+        run: docker compose -f docker-compose.yml up -d gateway
