@@ -21,16 +21,9 @@ jobs:
 
   database_cd:
     if: ${{ github.event.inputs.tags == 'true' }}
-    runs-on: self-hosted
-    steps:
-      - name: Checkout code 
-        uses: actions/checkout@v4
-      
-      - name: Deploy MongoDB
-        run: docker compose -f docker-compose.yml up mongodb -d
-
-      - name: Deploy MinIO
-        run: docker compose -f docker-compose.yml up minio -d
+    uses: smootysmart/mono-repo-test/.github/workflows/storage_cd.yml@main 
+    with:
+      environment: ${{ github.event.inputs.environment }}
 
   backend_cd:
     uses: smootysmart/mono-repo-test/.github/workflows/go-app_cd.yml@main

@@ -1,0 +1,24 @@
+name: Storage CD
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: false
+        type: string
+
+jobs:
+    storage_cd:
+        runs-on: self-hosted
+        steps:
+            - name: Checkout code 
+              uses: actions/checkout@v4
+      
+            - name: copy .env file
+              run: cp /home/smart/.env.${{ inputs.environment }} .env
+              
+            - name: Deploy MongoDB
+              run: docker compose -f docker-compose.yml up mongodb -d
+
+            - name: Deploy MinIO
+              run: docker compose -f docker-compose.yml up minio -d
