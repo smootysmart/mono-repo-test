@@ -7,11 +7,15 @@ on:
         description: 'Select the target deployment environment'
         required: true
         type: choice
-        default: 'uat'
+        default: 'dev'
         options: # ตัวเลือกที่จะปรากฏใน dropdown menu
-          - 'development'
+          - 'dev'
           - 'uat'
-          - 'production'
+          - 'prod'
+      tags:
+        description: 'Deploy Database Services'
+        required: false
+        type: boolean
 
 jobs:
 
@@ -36,7 +40,7 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   database_cd:
-    if: ${{ vars.DEPLOYDB == 'true' }}
+    if: ${{ github.event.inputs.tags == true }}
     runs-on: self-hosted
     steps:
       - name: Checkout code 
