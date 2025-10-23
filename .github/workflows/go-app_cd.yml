@@ -28,7 +28,7 @@ jobs:
       #   run: ln -s /home/smart/.env /home/smart/mono-repo-test/_work/mono-repo-test/mono-repo-test/.env
 
       - name: copy .env file
-        run: cp /home/smart/.env${{ inputs.environment }} .env
+        run: cp /home/smart/.env.${{ inputs.environment }} .env
 
       - name: create env for git sha
         run: echo "TAG=${{ inputs.tag }}" >> .env
