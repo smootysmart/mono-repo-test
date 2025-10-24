@@ -21,4 +21,4 @@ jobs:
         run: cp /home/smart/.env.${{ inputs.environment }} .env
 
       - name: Deploy Gateway
-        run: docker compose -f docker-compose.yml up -d gateway
+        run: docker compose -f docker-compose.yml up -d reverse-proxy

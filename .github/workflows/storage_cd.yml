@@ -17,8 +17,5 @@ jobs:
             - name: copy .env file
               run: cp /home/smart/.env.${{ inputs.environment }} .env
               
-            - name: Deploy MongoDB
-              run: docker compose -f docker-compose.yml up mongodb -d
-
-            - name: Deploy MinIO
-              run: docker compose -f docker-compose.yml up minio -d
+            - name: Deploy MongoDB & MinIO
+              run: docker compose -f docker-compose.yml up -d mongodb minio
