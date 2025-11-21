@@ -19,7 +19,7 @@ on:
             required: true
 
 jobs:
-  vue-cd:
+  deployment:
     runs-on: self-hosted
     steps:
       - name: Checkout code 
