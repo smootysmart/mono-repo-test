@@ -18,18 +18,42 @@ jobs:
 
       - name: Deploy reverse-proxy
         run: docker compose -f docker-compose.yml up -d reverse-proxy
+  
+  set_new_value:
+    runs-on: ubuntu-latest
+    outputs:
+      # 1. กำหนด Output ของ Job เพื่อให้ Job อื่นดึงไปใช้ได้
+      mapped_env: ${{ steps.mapping.outputs.env_output }} 
+    steps:
+      - name: Initialize or Set Variables
+        id: mapping
+        run: |
+          # รับค่า Input เดิม
+          INPUT_ENV="${{ github.ref_name }}"
+          
+          if [ "$INPUT_ENV" == "main" ]; then
+            NEW_ENV="prod"
+          elif [ "$INPUT_ENV" == "dev" ]; then
+            NEW_ENV="dev"
+          else
+            NEW_ENV="uat"
+          fi
+          
+          echo "env_output=$NEW_ENV" >> "$GITHUB_OUTPUT"
+          
+          echo "New environment value set to: $NEW_ENV"
 
   database_cd:
     if: ${{ github.event.inputs.tags == 'true' }}
     uses: smootysmart/mono-repo-test/.github/workflows/storage_cd.yml@main 
     with:
-      environment: ${{ github.ref_name }}
+      environment: ${{ needs.set_new_value.outputs.mapped_env }}
 
   backend_cd:
     uses: smootysmart/mono-repo-test/.github/workflows/reuse_cd.yml@main
     with:
       tag: latest
-      environment: ${{ github.ref_name }}
+      environment: ${{ needs.set_new_value.outputs.mapped_env }}
       project: backend
       
     secrets: 
@@ -40,7 +64,7 @@ jobs:
     uses: smootysmart/mono-repo-test/.github/workflows/reuse_cd.yml@main
     with:
       tag: latest
-      environment: ${{ github.ref_name }}
+      environment: ${{ needs.set_new_value.outputs.mapped_env }}
       project: frontend
       
     secrets: 
