@@ -10,15 +10,6 @@ on:
         
 
 jobs:
-  reverse_proxy_cd:
-    runs-on: self-hosted
-    steps:
-      - name: Checkout code 
-        uses: actions/checkout@v4
-
-      - name: Deploy reverse-proxy
-        run: docker compose -f docker-compose.yml up -d reverse-proxy
-  
   set_new_value:
     runs-on: ubuntu-latest
     outputs:
@@ -43,6 +34,18 @@ jobs:
           
           echo "New environment value set to: $NEW_ENV"
 
+  reverse_proxy_cd:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4
+      
+      - name: copy .env file
+        run: cp /home/smart/.env.${{ needs.set_new_value.outputs.mapped_env }} /.env
+
+      - name: Deploy reverse-proxy
+        run: docker compose -f docker-compose.yml up -d reverse-proxy
+
   database_cd:
     if: ${{ github.event.inputs.tags == 'true' }}
     uses: smootysmart/mono-repo-test/.github/workflows/storage_cd.yml@main 
@@ -55,6 +58,7 @@ jobs:
       tag: latest
       environment: ${{ needs.set_new_value.outputs.mapped_env }}
       project: backend
+      directory: ./GO-APP
       
     secrets: 
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -66,6 +70,7 @@ jobs:
       tag: latest
       environment: ${{ needs.set_new_value.outputs.mapped_env }}
       project: frontend
+      directory: ./FRONTEND-APP
       
     secrets: 
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}

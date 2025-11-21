@@ -12,6 +12,9 @@ on:
       project:
         required: true
         type: string
+      directory:
+        required: true
+        type: string
     secrets:
         DOCKERHUB_USERNAME:
             required: true
@@ -29,13 +32,13 @@ jobs:
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.project }}:${{ inputs.tag }}
 
       - name: copy .env file
-        run: cp /home/smart/.env.${{ inputs.environment }} ${{ inputs.project }}/.env
+        run: cp /home/smart/.env.${{ inputs.environment }} ${{ inputs.directory }}/.env
 
       - name: Deploy Frontend
         run: docker compose -f docker-compose.yml up -d ${{ inputs.project }}
 
       - name: remove variable in .env
-        run: sed -i '/^TAG=/d' ${{ inputs.project }}/.env
+        run: sed -i '/^TAG=/d' ${{ inputs.directory }}/.env
 
       - name: remove unused images
         run: docker image prune -a -f
