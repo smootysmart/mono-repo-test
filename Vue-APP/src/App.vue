@@ -11,6 +11,7 @@ import HelloWorld from './components/HelloWorld.vue'
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
     <a>Go APP is running on port 3000</a>
+    <p> HI This is for test github workflow</p>
   </div>
   <HelloWorld msg="Vite + Vue" />
 </template>
