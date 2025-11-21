@@ -1,4 +1,4 @@
-name: Reusable Vue App CD
+name: Reuse CD
 
 on:
   workflow_call:
@@ -29,13 +29,13 @@ jobs:
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.project }}:${{ inputs.tag }}
 
       - name: copy .env file
-        run: cp /home/smart/.env.${{ inputs.environment }} .env
+        run: cp /home/smart/.env.${{ inputs.environment }} ${{ inputs.project }}/.env
 
       - name: Deploy Frontend
         run: docker compose -f docker-compose.yml up -d ${{ inputs.project }}
 
       - name: remove variable in .env
-        run: sed -i '/^TAG=/d' .env
+        run: sed -i '/^TAG=/d' ${{ inputs.project }}/.env
 
       - name: remove unused images
         run: docker image prune -a -f

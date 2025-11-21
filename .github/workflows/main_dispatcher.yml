@@ -1,13 +1,11 @@
-name: Monorepo CI Dispatcher
+name: Main Dispatcher
 
 on:
-  push:
-    branches: [ main, deploydb ]
   pull_request:
     branches: [ main, deploydb ]
+    types: [ opened, synchronize ]
 
 jobs:
-  # 1. Job สำหรับตรวจสอบการเปลี่ยนแปลง (Filter Job)
   filter_paths:
     runs-on: ubuntu-latest
     outputs:
@@ -15,6 +13,9 @@ jobs:
       backend_changed: ${{ steps.filter.outputs.backend }}
     steps:
       - uses: actions/checkout@v4
+        # ใช้ fetch-depth: 0 เพื่อให้ paths-filter สามารถทำงานกับ Pull Request ได้อย่างแม่นยำ
+        with:
+          fetch-depth: 0 
       
       - name: Check for changed paths
         id: filter
@@ -26,25 +27,42 @@ jobs:
             backend:
               - 'GO-APP/**'
 
-  # 2. Job สำหรับเรียก Backend CI (Reusable Workflow Call)
   backend_ci:
-    needs: filter_paths # ระบุการขึ้นต่อกัน
-    if: ${{ needs.filter_paths.outputs.backend_changed == 'true' }} # ตรวจสอบ Output
-    uses: smootysmart/mono-repo-test/.github/workflows/go-app_ci.yml@main
+    name: Backend CI
+    needs: filter_paths
+    # เงื่อนไขการรัน
+    if: ${{ needs.filter_paths.outputs.backend_changed == 'true' }} 
+    uses: smootysmart/mono-repo-test/.github/workflows/reuse-ci.yml@main
     with:
       tag: latest
+      directory: ./GO-APP
+      project: backend
     secrets: 
+      # การส่ง Secrets นั้นถูกต้องแล้ว
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  # 3. Job สำหรับเรียก Frontend CI (Reusable Workflow Call)
   frontend_ci:
+    name: Frontend CI
     needs: filter_paths
     if: ${{ needs.filter_paths.outputs.frontend_changed == 'true' }} 
-    uses: smootysmart/mono-repo-test/.github/workflows/vue-app_ci.yml@main
+    uses: smootysmart/mono-repo-test/.github/workflows/reuse-ci.yml@main
     with:
       tag: latest
+      directory: ./Vue-APP
+      project: frontend
       
     secrets: 
+      # การส่ง Secrets นั้นถูกต้องแล้ว
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  # 4. Job ตรวจสอบสถานะ (State Check)
+  # ใช้เพื่อยืนยันว่า Jobs ที่จำเป็นทั้งหมดรันเสร็จสิ้นแล้ว หรือ Jobs ถูกข้ามไป
+  status_check:
+    name: Final Status Check
+    runs-on: ubuntu-latest
+    needs: [backend_ci, frontend_ci]
+    if: success() || failure() 
+    steps:
+      - run: echo "All necessary CI/CD workflows completed or skipped successfully."
