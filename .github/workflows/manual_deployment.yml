@@ -35,24 +35,27 @@ jobs:
           echo "New environment value set to: $NEW_ENV"
 
   reverse_proxy_cd:
+    needs: set_new_value
     runs-on: self-hosted
     steps:
       - name: Checkout code 
         uses: actions/checkout@v4
       
       - name: copy .env file
-        run: cp /home/smart/.env.${{ needs.set_new_value.outputs.mapped_env }} /.env
+        run: cp /home/smart/.env.${{ needs.set_new_value.outputs.mapped_env }} .env
 
       - name: Deploy reverse-proxy
         run: docker compose -f docker-compose.yml up -d reverse-proxy
 
   database_cd:
+    needs: set_new_value
     if: ${{ github.event.inputs.tags == 'true' }}
     uses: smootysmart/mono-repo-test/.github/workflows/storage_cd.yml@main 
     with:
       environment: ${{ needs.set_new_value.outputs.mapped_env }}
 
   backend_cd:
+    needs: set_new_value
     uses: smootysmart/mono-repo-test/.github/workflows/reuse_cd.yml@main
     with:
       tag: latest
@@ -65,6 +68,7 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   frontend_cd:
+    needs: set_new_value
     uses: smootysmart/mono-repo-test/.github/workflows/reuse_cd.yml@main
     with:
       tag: latest
