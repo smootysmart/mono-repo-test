@@ -1,0 +1,48 @@
+name: Manual Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Deploy Database Services'
+        required: false
+        type: boolean
+        
+
+jobs:
+  reverse_proxy_cd:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v4
+
+      - name: Deploy reverse-proxy
+        run: docker compose -f docker-compose.yml up -d reverse-proxy
+
+  database_cd:
+    if: ${{ github.event.inputs.tags == 'true' }}
+    uses: smootysmart/mono-repo-test/.github/workflows/storage_cd.yml@main 
+    with:
+      environment: ${{ github.ref_name }}
+
+  backend_cd:
+    uses: smootysmart/mono-repo-test/.github/workflows/reuse_cd.yml@main
+    with:
+      tag: latest
+      environment: ${{ github.ref_name }}
+      project: backend
+      
+    secrets: 
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  frontend_cd:
+    uses: smootysmart/mono-repo-test/.github/workflows/reuse_cd.yml@main
+    with:
+      tag: latest
+      environment: ${{ github.ref_name }}
+      project: frontend
+      
+    secrets: 
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

@@ -1,99 +1,33 @@
-name: Reusable CI Workflow
+name: Reuse CI
 
 on:
   workflow_call:
     inputs:
-      env:
+      tag:
         required: true
         type: string
-      tagvue:
+      directory:
         required: true
         type: string
-      taggo:
+      project:
         required: true
         type: string
     secrets:
-        DOCKER_USERNAME:
+        DOCKERHUB_USERNAME:
             required: true
-        DOCKER_PASSWORD:
+        DOCKERHUB_TOKEN:
             required: true
 
 jobs:
-  vue-ci:
+  build-and-push:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    steps:      
+      - uses: actions/checkout@v4
+      
+      - name: docker build
+        run: docker build ${{ inputs.directory}} -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.project }}:${{ inputs.tag }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build project
-        run: npm run build
-        working-directory: ./Vue-APP
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-            username: ${{ secrets.DOCKER_USERNAME }}
-            password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v4
-        with:
-            context: .
-            push: true
-            tags: ${{ secrets.DOCKER_USERNAME }}:${{ inputs.tagvue }}
-
-      # - name: Deploy to environment
-      #   if: ${{ inputs.env == 'production' }}
-      #   run: echo "Deploying to production environment"
-
-  go-ci:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: '1.25'
-
-      - name: Install dependencies
-        run: go mod tidy
-
-      - name: Build project
-        run: go build -o server .
-        working-directory: ./GO-APP
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-            username: ${{ secrets.DOCKER_USERNAME }}
-            password: ${{ secrets.DOCKER_PASSWORD }}
-  
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v4
-        with:
-            context: .
-            push: true
-            tags: ${{ secrets.DOCKER_USERNAME }}:${{ inputs.taggo }}
-
-      # - name: Deploy to environment
-      #   if: ${{ inputs.env == 'production' }}
-      #   run: echo "Deploying to production environment"
+      - name: push image to docker hub
+        run: |
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.project }}:${{ inputs.tag }}
