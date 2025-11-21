@@ -2,9 +2,9 @@
 FROM node:20-alpine as build
 WORKDIR /app
 COPY package*.json ./
-RUN bun i
+RUN npm i
 COPY . .
-RUN bun run build
+RUN npm run build
 
 # Stage 2: Serve (using nginx)
 FROM nginx:alpine
