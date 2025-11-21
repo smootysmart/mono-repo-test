@@ -32,7 +32,7 @@ jobs:
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.project }}:${{ inputs.tag }}
 
       - name: copy .env file
-        run: cp /home/smart/.env.${{ inputs.environment }} ${{ inputs.directory }}/.env
+        run: cp /home/smart/.env.${{ inputs.environment }} .env
 
       - name: Deploy Frontend
         run: docker compose -f docker-compose.yml up -d ${{ inputs.project }}
