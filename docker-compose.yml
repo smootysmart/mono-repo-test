@@ -4,6 +4,8 @@ services:
     image: nginx:latest
     container_name: reverse-proxy-${ENV}
     restart: always
+    ports:
+      - "27017:27017" # Internal Port และ Default External Port
     volumes:
       - /nginx/conf:/etc/nginx/conf.d
       - /nginx/html:/usr/share/nginx/html
@@ -48,7 +50,7 @@ services:
     container_name: backend-${ENV}
     ports:
       - "${BACKEND_PORT}:8080"
-    # env_file:
+    env_file:
       - ./.env 
     networks:
       - app-network
@@ -60,7 +62,7 @@ services:
     container_name: frontend-${ENV}
     ports:
       - "${FRONTEND_PORT}:3000" # Internal Port และ Default External Port
-    # env_file:
+    env_file:
       - ./.env
     networks:
       - app-network
