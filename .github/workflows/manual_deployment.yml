@@ -61,7 +61,6 @@ jobs:
       tag: latest
       environment: ${{ needs.set_new_value.outputs.mapped_env }}
       project: backend
-      directory: ./GO-APP
       
     secrets: 
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -74,7 +73,6 @@ jobs:
       tag: latest
       environment: ${{ needs.set_new_value.outputs.mapped_env }}
       project: frontend
-      directory: ./FRONTEND-APP
       
     secrets: 
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
