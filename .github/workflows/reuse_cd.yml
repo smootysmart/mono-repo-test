@@ -12,9 +12,7 @@ on:
       project:
         required: true
         type: string
-      directory:
-        required: true
-        type: string
+        
     secrets:
         DOCKERHUB_USERNAME:
             required: true
@@ -38,7 +36,7 @@ jobs:
         run: docker compose -f docker-compose.yml up -d ${{ inputs.project }}
 
       - name: remove variable in .env
-        run: sed -i '/^TAG=/d' ${{ inputs.directory }}/.env
+        run: sed -i '/^TAG=/d' .env
 
       - name: remove unused images
         run: docker image prune -a -f
