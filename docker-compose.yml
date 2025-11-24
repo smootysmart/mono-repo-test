@@ -5,7 +5,7 @@ services:
     container_name: reverse-proxy-${ENV}
     restart: always
     ports:
-      - "80:80" # Internal Port และ Default External Port
+      - "80:80"
       - "443:443"
     volumes:
       - /nginx/conf:/etc/nginx/conf.d
@@ -23,7 +23,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     ports:
-      - "27017:27017" # Internal Port และ Default External Port
+      - "27017:27017"
     networks:
       - database-network
     volumes:
@@ -62,7 +62,7 @@ services:
     image: smootysmart/frontend:latest
     container_name: frontend-${ENV}
     ports:
-      - "${FRONTEND_PORT}:3000" # Internal Port และ Default External Port
+      - "${FRONTEND_PORT}:3000"
     env_file:
       - ./.env
     networks:
