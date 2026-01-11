@@ -40,7 +40,7 @@ jobs:
       - name: Prepare .env file
         run: cp /home/smart/.env.${{ inputs.environment }} .env
 
-      - name: Deploy Frontend
+      - name: Deploy
         run: docker compose -f docker-compose.yml up -d ${{ inputs.project }}
 
       - name: Remove unused images
