@@ -50,5 +50,5 @@ jobs:
         with: 
           package-name: ${{ inputs.project }} 
           package-type: 'container'
-          min-versions-to-keep: 3 
+          min-versions-to-keep: 2 
           delete-only-untagged-versions: 'true'
