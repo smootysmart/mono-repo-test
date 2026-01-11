@@ -12,22 +12,43 @@ on:
       project:
         required: true
         type: string
-    secrets:
-        DOCKERHUB_USERNAME:
-            required: true
-        DOCKERHUB_TOKEN:
-            required: true
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
     steps:      
       - uses: actions/checkout@v4
-      
-      - name: docker build
-        run: docker build ${{ inputs.directory}} -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.project }}:${{ inputs.tag }}
 
-      - name: push image to docker hub
-        run: |
-          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.project }}:${{ inputs.tag }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 2. Login เข้า GHCR (ใช้ Token ของ GitHub เอง)
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 3. Build และ Push พร้อม Cache
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ inputs.directory }}
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/${{ inputs.project }}:${{ inputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Delete older images
+        if: success()
+        uses: actions/delete-package-versions@v5
+        with: 
+          package-name: ${{ inputs.project }} 
+          package-type: 'container'
+          min-versions-to-keep: 3 
+          delete-only-untagged-versions: 'true'
