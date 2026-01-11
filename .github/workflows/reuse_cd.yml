@@ -35,7 +35,7 @@ jobs:
 
       # 3. Pull Image จาก GHCR
       - name: Pull image from GHCR
-        run: docker pull ghcr.io/${{ github.repository_owner }}/${{ inputs.project }}:${{ inputs.tag }}
+        run: docker pull ghcr.io/${{ github.repository_owner }}/${{ inputs.project }}:${{ inputs.tag }} || true
 
       - name: Prepare .env file
         run: cp /home/smart/.env.${{ inputs.environment }} .env
